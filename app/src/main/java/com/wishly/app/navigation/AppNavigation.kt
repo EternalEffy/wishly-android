@@ -34,7 +34,6 @@ fun AppNavigation(
         navController = navController,
         startDestination = Screen.Splash.route
     ) {
-        // Splash
         composable(Screen.Splash.route) {
             SplashScreen(
                 onNavigateToLogin = {
@@ -51,7 +50,6 @@ fun AppNavigation(
             )
         }
 
-        // Login
         composable(Screen.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
@@ -66,7 +64,6 @@ fun AppNavigation(
             )
         }
 
-        // Register
         composable(Screen.Register.route) {
             RegisterScreen(
                 onRegisterSuccess = {
@@ -81,7 +78,6 @@ fun AppNavigation(
             )
         }
 
-        // Home
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToCreate = {
@@ -99,7 +95,6 @@ fun AppNavigation(
             )
         }
 
-        // Create Wishlist
         composable(Screen.CreateWishlist.route) {
             CreateWishlistScreen(
                 onNavigateBack = { navController.popBackStack() },
@@ -107,7 +102,6 @@ fun AppNavigation(
             )
         }
 
-        // Wishlist Detail
         composable(Screen.WishlistDetail.route) { backStackEntry ->
             val hash = backStackEntry.arguments?.getString("hash") ?: return@composable
             WishlistDetailScreen(
@@ -119,7 +113,6 @@ fun AppNavigation(
             )
         }
 
-        // Share
         composable(Screen.Share.route) { backStackEntry ->
             val hash = backStackEntry.arguments?.getString("hash") ?: ""
             val title = backStackEntry.arguments?.getString("title") ?: ""

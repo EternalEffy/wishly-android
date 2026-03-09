@@ -23,7 +23,7 @@ object DependencyContainer {
         retrofit = ApiClient.create(context, tokenManager!!)
         authApi = retrofit!!.create(AuthApi::class.java)
         wishlistApi = retrofit!!.create(WishlistApi::class.java)
-        authRepository = AuthRepository(authApi!!)
+        authRepository = AuthRepository(authApi!!, tokenManager!!)
         wishlistRepository = WishlistRepository(wishlistApi!!)
     }
 
