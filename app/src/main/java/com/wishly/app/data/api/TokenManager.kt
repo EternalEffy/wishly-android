@@ -1,6 +1,7 @@
 package com.wishly.app.data.api
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -30,9 +31,7 @@ class TokenManager(private val context: Context) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun getAccessToken(): String? = cachedAccessToken
-
     fun getRefreshToken(): String? = cachedRefreshToken
-
     fun isLoggedIn(): Boolean = !cachedAccessToken.isNullOrEmpty()
 
     fun saveTokens(accessToken: String, refreshToken: String) {
@@ -59,10 +58,19 @@ class TokenManager(private val context: Context) {
         }
     }
 
-    suspend fun loadTokens() {
+    suspend fun loadFromDataStore() {
+        Log.d("TokenManager", "=== loadFromDataStore() START ===")
+
         context.dataStore.data.first().let { preferences ->
+            Log.d("TokenManager", "DataStore loaded")
             cachedAccessToken = preferences[stringPreferencesKey(Constants.ACCESS_TOKEN)]
             cachedRefreshToken = preferences[stringPreferencesKey(Constants.REFRESH_TOKEN)]
+
+            Log.d("TokenManager",
+                "ACCESS_TOKEN: ${if (cachedAccessToken != null) "present (${cachedAccessToken!!.take(30)}...)" else "NULL"}")
+            Log.d("TokenManager",
+                "REFRESH_TOKEN: ${if (cachedRefreshToken != null) "present (${cachedRefreshToken!!.take(30)}...)" else "NULL"}")
+            Log.d("TokenManager", "=== loadFromDataStore() COMPLETE ===")
         }
     }
 

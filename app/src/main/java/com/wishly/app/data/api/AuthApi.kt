@@ -4,7 +4,6 @@ import com.wishly.app.data.model.AuthResponse
 import com.wishly.app.data.model.LoginRequest
 import com.wishly.app.data.model.RefreshRequest
 import com.wishly.app.data.model.RegisterRequest
-import com.wishly.app.data.model.Tokens
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -17,6 +16,6 @@ interface AuthApi {
     suspend fun login(@Body request: LoginRequest): AuthResponse
 
     @POST("api/auth/refresh")
-    suspend fun refresh(@Body refreshToken: String): AuthResponse
+    suspend fun refresh(@Body refreshToken: RefreshRequest): AuthResponse
 
 }

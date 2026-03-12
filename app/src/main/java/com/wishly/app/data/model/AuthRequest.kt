@@ -13,5 +13,5 @@ data class RegisterRequest(
 )
 
 data class RefreshRequest(
-    val refreshToken: String
+    @SerializedName("refreshToken") val refreshToken: String
 )
