@@ -15,7 +15,7 @@ object ApiClient {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        val authInterceptor = AuthInterceptor(tokenManager)
+        val authInterceptor = AuthInterceptor(tokenManager, Constants.BASE_URL)
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)

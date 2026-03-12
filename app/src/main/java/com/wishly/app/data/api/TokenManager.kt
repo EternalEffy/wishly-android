@@ -11,13 +11,15 @@ import com.wishly.app.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class TokenManager(private val context: Context) {
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_tokens")
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+class TokenManager(private val context: Context) {
 
     @Volatile
     private var cachedAccessToken: String? = null
@@ -25,39 +27,46 @@ class TokenManager(private val context: Context) {
     @Volatile
     private var cachedRefreshToken: String? = null
 
-    init {
-        observeToken()
-    }
-
-    private fun observeToken() {
-        scope.launch {
-            context.dataStore.data
-                .map { preferences ->
-                    preferences[stringPreferencesKey(Constants.ACCESS_TOKEN)]
-                }
-                .collect { token ->
-                    cachedAccessToken = token
-                }
-        }
-    }
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun getAccessToken(): String? = cachedAccessToken
+
     fun getRefreshToken(): String? = cachedRefreshToken
-
-    suspend fun saveTokens(accessToken: String, refreshToken: String) {
-        context.dataStore.edit { preferences ->
-            preferences[stringPreferencesKey(Constants.ACCESS_TOKEN)] = accessToken
-            preferences[stringPreferencesKey(Constants.REFRESH_TOKEN)] = refreshToken
-        }
-    }
-
-    suspend fun clearTokens() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(stringPreferencesKey(Constants.ACCESS_TOKEN))
-            preferences.remove(stringPreferencesKey(Constants.REFRESH_TOKEN))
-        }
-    }
 
     fun isLoggedIn(): Boolean = !cachedAccessToken.isNullOrEmpty()
 
+    fun saveTokens(accessToken: String, refreshToken: String) {
+        cachedAccessToken = accessToken
+        cachedRefreshToken = refreshToken
+
+        scope.launch {
+            context.dataStore.edit { preferences ->
+                preferences[stringPreferencesKey(Constants.ACCESS_TOKEN)] = accessToken
+                preferences[stringPreferencesKey(Constants.REFRESH_TOKEN)] = refreshToken
+            }
+        }
+    }
+
+    fun clearTokens() {
+        cachedAccessToken = null
+        cachedRefreshToken = null
+
+        scope.launch {
+            context.dataStore.edit { preferences ->
+                preferences.remove(stringPreferencesKey(Constants.ACCESS_TOKEN))
+                preferences.remove(stringPreferencesKey(Constants.REFRESH_TOKEN))
+            }
+        }
+    }
+
+    suspend fun loadTokens() {
+        context.dataStore.data.first().let { preferences ->
+            cachedAccessToken = preferences[stringPreferencesKey(Constants.ACCESS_TOKEN)]
+            cachedRefreshToken = preferences[stringPreferencesKey(Constants.REFRESH_TOKEN)]
+        }
+    }
+
+    fun cleanup() {
+        scope.cancel()
+    }
 }

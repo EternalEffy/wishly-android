@@ -1,7 +1,11 @@
 package com.wishly.app.navigation
 
+import android.util.Log
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
+import com.wishly.app.di.ViewModelFactory
 import com.wishly.app.presentation.auth.*
 import com.wishly.app.presentation.home.*
 import com.wishly.app.presentation.create.*
@@ -18,6 +22,7 @@ sealed class Screen(val route: String) {
     object WishlistDetail : Screen("wishlist_detail/{hash}") {
         fun createRoute(hash: String) = "wishlist_detail/$hash"
     }
+
     object Share : Screen("share/{hash}/{title}") {
         fun createRoute(hash: String, title: String) = "share/$hash/$title"
     }
@@ -78,7 +83,33 @@ fun AppNavigation(
             )
         }
 
-        composable(Screen.Home.route) {
+        composable(Screen.Home.route) { backStackEntry ->
+            val viewModel: HomeViewModel = viewModel(backStackEntry) {
+                HomeViewModel(
+                    wishlistRepository = ViewModelFactory.getWishlistRepository()
+                )
+            }
+
+            val savedStateHandle = backStackEntry.savedStateHandle
+
+            val hasProcessedResult = remember { mutableStateOf(false) }
+
+            if (!hasProcessedResult.value) {
+                val newWishlistJson = savedStateHandle.get<String>(NavKeys.KEY_NEW_WISHLIST)
+
+                if (newWishlistJson != null) {
+                    Log.d("APP NAV", ">>> Processing new wishlist from navigation result")
+
+                    val newWishlist = NavKeys.argToWishlist(newWishlistJson)
+                    viewModel.addWishlistOptimistically(newWishlist)
+
+                    savedStateHandle.remove<String>(NavKeys.KEY_NEW_WISHLIST)
+                    hasProcessedResult.value = true
+
+                    Log.d("APP NAV", "<<< Navigation result processed and cleared")
+                }
+            }
+
             HomeScreen(
                 onNavigateToCreate = {
                     navController.navigate(Screen.CreateWishlist.route)
@@ -97,6 +128,7 @@ fun AppNavigation(
 
         composable(Screen.CreateWishlist.route) {
             CreateWishlistScreen(
+                navController = navController,
                 onNavigateBack = { navController.popBackStack() },
                 onWishlistCreated = { navController.popBackStack() }
             )

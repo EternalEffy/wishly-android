@@ -1,5 +1,6 @@
 package com.wishly.app.data.repository
 
+import com.wishly.app.data.api.ApiErrorHandler
 import com.wishly.app.data.api.WishlistApi
 import com.wishly.app.data.model.CreateGiftItemRequest
 import com.wishly.app.data.model.CreateWishlistRequest
@@ -7,60 +8,42 @@ import com.wishly.app.data.model.GiftItem
 import com.wishly.app.data.model.ReserveGiftRequest
 import com.wishly.app.data.model.Wishlist
 import com.wishly.app.util.Result
-
 class WishlistRepository(private val wishlistApi: WishlistApi) {
 
     suspend fun getMyWishlists(): Result<List<Wishlist>> {
-        return try {
-            val response = wishlistApi.getMyWishlists()
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to get wishlists")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.getMyWishlists()
         }
     }
 
     suspend fun getWishlistById(id: String): Result<Wishlist> {
-        return try {
-            val response = wishlistApi.getWishlistById(id)
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to get wishlist")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.getWishlistById(id)
         }
     }
 
+
     suspend fun createWishlist(request: CreateWishlistRequest): Result<Wishlist> {
-        return try {
-            val response = wishlistApi.createWishlist(request)
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to create wishlist")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.createWishlist(request)
         }
     }
 
     suspend fun deleteWishlist(id: String): Result<Unit> {
-        return try {
+        return ApiErrorHandler.handleUnitResponse {
             wishlistApi.deleteWishlist(id)
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to delete wishlist")
         }
     }
 
     suspend fun addGiftItem(wishlistId: String, request: CreateGiftItemRequest): Result<GiftItem> {
-        return try {
-            val response = wishlistApi.addGiftItem(wishlistId, request)
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to add gift item")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.addGiftItem(wishlistId, request)
         }
     }
 
     suspend fun getGiftItems(wishlistId: String): Result<List<GiftItem>> {
-        return try {
-            val response = wishlistApi.getGiftItems(wishlistId)
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to get gift items")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.getGiftItems(wishlistId)
         }
     }
 
@@ -69,20 +52,14 @@ class WishlistRepository(private val wishlistApi: WishlistApi) {
         itemId: String,
         request: ReserveGiftRequest
     ): Result<GiftItem> {
-        return try {
-            val response = wishlistApi.reserveGift(wishlistId, itemId, request)
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to reserve gift")
+        return ApiErrorHandler.handleResponse {
+            wishlistApi.reserveGift(wishlistId, itemId, request)
         }
     }
 
     suspend fun cancelReservation(wishlistId: String, itemId: String): Result<Unit> {
-        return try {
+        return ApiErrorHandler.handleUnitResponse {
             wishlistApi.cancelReservation(wishlistId, itemId)
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to cancel reservation")
         }
     }
 }
