@@ -1,15 +1,23 @@
 package com.wishly.app.presentation.auth
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.wishly.app.R
+import com.wishly.app.ui.components.GradientCircularProgressIndicator
 import kotlinx.coroutines.delay
 
 @Composable
@@ -18,15 +26,24 @@ fun SplashScreen(
     onNavigateToHome: () -> Unit,
     isLoggedIn: Boolean = false
 ) {
-    val scale = remember { Animatable(0f) }
+    val logoAlpha = remember { Animatable(0f) }
+    val textAlpha = remember { Animatable(0f) }
+    val progressAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(key1 = true) {
-        scale.animateTo(
+        logoAlpha.animateTo(
             targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = 800,
-                easing = FastOutSlowInEasing
-            )
+            animationSpec = tween(durationMillis = 600, easing = LinearEasing)
+        )
+
+        textAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 400, easing = LinearEasing)
+        )
+
+        progressAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 300, easing = LinearEasing)
         )
 
         delay(500)
@@ -41,38 +58,48 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE6E0FF).copy(alpha = 0.8f),
+                        Color(0xFFD0FFF5).copy(alpha = 0.8f)
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.scale(scale.value)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "🎁",
-                fontSize = 80.sp,
-                modifier = Modifier.padding(bottom = 16.dp)
+            Image(
+                painter = painterResource(id = R.drawable.wishly_brand_logo),
+                contentDescription = "Logo",
+                modifier = Modifier.alpha(logoAlpha.value)
             )
 
             Text(
-                text = "Wishly",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = "делись желаниями",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-            CircularProgressIndicator(
+                text = "Share Your Wishes",
+                color = Color(0xFF6B7280),
+                style = MaterialTheme.typography.titleSmall.copy(
+                    shadow = Shadow(
+                        color = Color(0xFF24243F).copy(alpha = 0.3f),
+                        offset = Offset(1.0f, 3.0f),
+                        blurRadius = 3f
+                    )
+                ),
                 modifier = Modifier
-                    .padding(top = 32.dp)
-                    .size(40.dp),
-                color = MaterialTheme.colorScheme.primary
+                    .alpha(textAlpha.value)
+            )
+
+            GradientCircularProgressIndicator(
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(12.dp)
+                    .alpha(progressAlpha.value),
+                strokeWidth = 8.dp,
+                durationMillis = 1300
             )
         }
     }

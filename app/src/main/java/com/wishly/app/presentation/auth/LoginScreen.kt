@@ -1,5 +1,7 @@
 package com.wishly.app.presentation.auth
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,10 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,10 +29,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wishly.app.R
 import com.wishly.app.di.ViewModelFactory
+import com.wishly.app.ui.components.ButtonLoadingContent
+import com.wishly.app.ui.components.ButtonText
+import com.wishly.app.ui.components.GradientButton
 
 @Composable
 fun LoginScreen(
@@ -51,20 +60,10 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Welcome Back",
-            style = MaterialTheme.typography.headlineMedium
+        Image(
+            painter = painterResource(id = R.drawable.wishly_brand_logo),
+            contentDescription = "Logo"
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Login to continue",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
             value = uiState.email,
@@ -118,27 +117,20 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        GradientButton(
             onClick = { viewModel.login() },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            enabled = !uiState.isLoading,
-            shape = MaterialTheme.shapes.medium
+            enabled = !uiState.isLoading
         ) {
             if (uiState.isLoading) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Logging in...")
-                }
+                ButtonLoadingContent(
+                    loadingText = "Logging in...",
+                    modifier = Modifier.align(Alignment.Center)
+                )
             } else {
-                Text("Login", style = MaterialTheme.typography.titleMedium)
+                ButtonText(
+                    text = "Login",
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
 

@@ -38,10 +38,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wishly.app.di.ViewModelFactory
+import com.wishly.app.ui.components.ButtonLoadingContent
+import com.wishly.app.ui.components.ButtonText
+import com.wishly.app.ui.components.GradientButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -74,7 +80,6 @@ fun CreateWishlistScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -94,7 +99,6 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // title
         OutlinedTextField(
             value = uiState.title,
             onValueChange = { viewModel.onTitleChange(it) },
@@ -106,7 +110,6 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // description
         OutlinedTextField(
             value = uiState.description,
             onValueChange = { viewModel.onDescriptionChange(it) },
@@ -118,7 +121,6 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // privacy
         Text(
             text = "Privacy",
             style = MaterialTheme.typography.bodyMedium,
@@ -146,7 +148,6 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // event date
         var showDatePicker by remember { mutableStateOf(false) }
 
         OutlinedTextField(
@@ -206,7 +207,6 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // error
         if (uiState.error != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -233,29 +233,20 @@ fun CreateWishlistScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // create wishlist btn
-        Button(
+        GradientButton(
             onClick = { viewModel.createWishlist() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            enabled = !uiState.isLoading
+            enabled = !uiState.isLoading,
+            enableShineAnimation = false
         ) {
             if (uiState.isLoading) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Creating...")
-                }
+                ButtonLoadingContent(
+                    loadingText = "Creating...",
+                    modifier = Modifier.align(Alignment.Center)
+                )
             } else {
-                Text("Create Wishlist", style = MaterialTheme.typography.titleMedium)
+                ButtonText(
+                    text = "Create Wishlist"
+                )
             }
         }
     }
